@@ -1,0 +1,32 @@
+
+version: '2.0'
+
+volumes:
+    db:
+
+services:
+    app:
+        build: .
+        restart: always
+        depends_on:
+            - db
+        environment:
+            EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+            SECRET_KEY: ${SECRET_KEY}
+            DATABASE_URL: postgres://mygpo:mygpo@db/mygpo
+            # Debug must be true when using development server
+            DEBUG: "True"
+        ports:
+            - "8000:8000"
+
+    db:
+        image: "postgres:alpine"
+        volumes:
+            - "db:/var/lib/postgresql/data"
+        environment:
+            POSTGRES_USER: mygpo
+            POSTGRES_PASSWORD: mygpo
+        restart: always
+        expose: 
+            - "5432"
+
