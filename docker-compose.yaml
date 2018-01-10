@@ -3,6 +3,7 @@ version: '2.0'
 
 volumes:
     db:
+    data_dir:
 
 services:
     app:
@@ -16,8 +17,13 @@ services:
             DATABASE_URL: postgres://mygpo:mygpo@db/mygpo
             # Debug must be true when using development server
             DEBUG: "True"
+        volumes:
+            - "data_dir:/usr/src/mygpo"
         ports:
             - "8000:8000"
+        networks:
+            - default
+            - caddy
 
     db:
         image: "postgres:alpine"
@@ -30,3 +36,7 @@ services:
         expose: 
             - "5432"
 
+networks:
+    caddy:
+        external:
+            name: caddy_default

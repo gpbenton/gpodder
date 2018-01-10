@@ -15,4 +15,6 @@ VOLUME /usr/src/mygpo
 
 EXPOSE 8000
 
-CMD [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+RUN pip install gunicorn
+
+CMD [ "gunicorn", "-b", ":8000", "mygpo.wsgi" ]
