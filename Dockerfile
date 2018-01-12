@@ -15,6 +15,6 @@ VOLUME /usr/src/mygpo
 
 EXPOSE 8000
 
-RUN pip install gunicorn
+RUN pip install gunicorn celery
 
 CMD [ "gunicorn", "-b", ":8000", "mygpo.wsgi" ]

@@ -11,12 +11,14 @@ services:
         restart: always
         depends_on:
             - db
+            - redis
         environment:
             EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
             SECRET_KEY: ${SECRET_KEY}
             DATABASE_URL: postgres://mygpo:mygpo@db/mygpo
+            CELERY_BROKER_URL: "redis://redis:6379//"
             # Debug must be true when using development server
-            DEBUG: "True"
+            DEBUG: ${DEBUG}
         volumes:
             - "data_dir:/usr/src/mygpo"
         ports:
@@ -27,6 +29,7 @@ services:
 
     db:
         image: "postgres:alpine"
+        restart: always
         volumes:
             - "db:/var/lib/postgresql/data"
         environment:
@@ -35,6 +38,28 @@ services:
         restart: always
         expose: 
             - "5432"
+
+    redis:
+        image: "redis:alpine"
+
+    celery:
+        build: .
+        restart: always
+        environment:
+            EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+            SECRET_KEY: ${SECRET_KEY}
+            DATABASE_URL: postgres://mygpo:mygpo@db/mygpo
+            # Debug must be true when using development server
+            DEBUG: ${DEBUG}
+        volumes_from:
+            - app
+        entrypoint:
+            - celery
+            - -A
+            - mygpo
+            - -b
+            - "redis://redis:6379//"
+            - worker
 
 networks:
     caddy:
