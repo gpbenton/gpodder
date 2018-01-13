@@ -5,7 +5,7 @@ docker-compose files to build a local gpodder.net server.
 
 - Machines come up and can subscribe to topics.  
 - Devices can sync.  
-- Search doesn't work.  
+- Search doesn't work the first attempt.  Subsequent attempts work fine.
 
 ## Usage
 
