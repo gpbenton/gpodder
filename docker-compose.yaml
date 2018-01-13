@@ -42,8 +42,28 @@ services:
     redis:
         image: "redis:alpine"
 
-    celery:
-        build: .
+    beat:
+        image: gpodder_app
+        restart: always
+        environment:
+            EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+            SECRET_KEY: ${SECRET_KEY}
+            DATABASE_URL: postgres://mygpo:mygpo@db/mygpo
+            LOGGING_CELERY_LEVEL: INFO
+        volumes_from:
+            - app
+        entrypoint:
+            - celery
+            - -A
+            - mygpo
+            - beat
+            - -b
+            - "redis://redis:6379//"
+            - "--scheduler"
+            - django_celery_beat.schedulers:DatabaseScheduler
+
+    worker:
+        image: gpodder_app
         restart: always
         environment:
             EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
