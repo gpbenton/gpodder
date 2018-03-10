@@ -41,3 +41,11 @@ http://localhost:2015 {
 
 I haven't found a way to use subdirectories.
 
+### Upgrading
+
+Since the code gets put in to the gpodder_data_dir volume when it is created, you have to remove the volume if you want to update the code.  So you have to do
+```bash
+docker-compose down
+docker volume rm gpodder_data_dir
+docker-compose up -d
+```
