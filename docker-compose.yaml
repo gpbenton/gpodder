@@ -3,7 +3,6 @@ version: '2.0'
 
 volumes:
     db:
-    data_dir:
 
 services:
     app:
@@ -19,8 +18,6 @@ services:
             CELERY_BROKER_URL: "redis://redis:6379//"
             # Debug must be true when using development server
             DEBUG: ${DEBUG}
-        volumes:
-            - "data_dir:/usr/src/mygpo"
         ports:
             - "8000:8000"
         networks:
@@ -53,9 +50,17 @@ services:
             SECRET_KEY: ${SECRET_KEY}
             DATABASE_URL: postgres://mygpo:mygpo@db/mygpo
             LOGGING_CELERY_LEVEL: INFO
-        volumes_from:
-            - app
-        command: celery -A mygpo beat -b redis://redis:6379// --pidfile /tmp/celerybeat.pid --scheduler django_celery_beat.schedulers:DatabaseScheduler
+        entrypoint: 
+                - celery 
+                - -A 
+                - mygpo 
+                - beat 
+                - -b 
+                - redis://redis:6379// 
+                - --pidfile 
+                - /tmp/celerybeat.pid 
+                - --scheduler 
+                - django_celery_beat.schedulers:DatabaseScheduler
 
     worker:
         image: gpodder_app
@@ -67,8 +72,6 @@ services:
             SECRET_KEY: ${SECRET_KEY}
             DATABASE_URL: postgres://mygpo:mygpo@db/mygpo
             LOGGING_CELERY_LEVEL: INFO
-        volumes_from:
-            - app
         entrypoint:
             - celery
             - -A

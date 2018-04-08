@@ -11,8 +11,6 @@ WORKDIR /usr/src/mygpo
 
 RUN pip install -r requirements.txt
 
-VOLUME /usr/src/mygpo
-
 EXPOSE 8000
 
 RUN pip install gunicorn celery django-celery-beat
