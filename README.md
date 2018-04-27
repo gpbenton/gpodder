@@ -21,19 +21,27 @@ DEBUG=False
 Then the following commands
 
 ```bash
+$ mkdir static    # create a directory to reveal static images for web server
 $ docker-compose up -d
 $ docker exec gpodder_app_1 python manage.py migrate # sets up DB
-$ docker exec gpodder_app_1 python manage.py collectstatic  # Moves static files to /staticfiles/
+$ docker exec gpodder_app_1 python manage.py collectstatic  # Moves static files to /staticfiles/ which should be shown in ./static dir
 ```
 
-Then connect to localhost:8000 with your browser.  I go through caddy with this configuration.  The `gpodder_data_dir` volume is mounted at `/var/www/gpodder`
+Then connect to localhost:8000 with your browser.  I go through caddy with this configuration.
 
 ```
 http://localhost:2015 {
-  root /var/www/gpodder/htdocs
+  root /var/www/gpodder/
+  redir {
+    /clientconfig.json /static/clientconfig.json
+    /failpodder.svg /static/failpodder.svg
+    /favicon.ico /static/favicon.ico
+    /favicon.png /static/favicon.png
+    /robots.txt /static/robots.txt
+  }
   proxy / gpodder_app_1:8000 {
     transparent
-    except /media/
+    except /static/ /clientconfig.json /failpodder.svg /favicon.ico /favicon.png /robots.txt
   }
   log  stdout 
 }
@@ -43,9 +51,9 @@ I haven't found a way to use subdirectories.
 
 ### Upgrading
 
-Since the code gets put in to the gpodder_data_dir volume when it is created, you have to remove the volume if you want to update the code.  So you have to do
 ```bash
-docker-compose down
-docker volume rm gpodder_data_dir
+docker-compose pull
+docker-compose build --pull
 docker-compose up -d
+docker exec gpodder_app_1 python manage.py collectstatic  # Moves static files to /staticfiles/ which should be shown in ./static dir
 ```
