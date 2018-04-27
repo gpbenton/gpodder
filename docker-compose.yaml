@@ -18,6 +18,8 @@ services:
             CELERY_BROKER_URL: "redis://redis:6379//"
             # Debug must be true when using development server
             DEBUG: ${DEBUG}
+        volumes:
+            - "./static:/usr/src/mygpo/staticfiles"
         ports:
             - "8000:8000"
         networks:
