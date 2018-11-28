@@ -1,4 +1,5 @@
-
+# After initial start need to do 
+#     docker exec -it gpodder_app_1 python manage.py migrate
 version: '2.0'
 
 volumes:
@@ -27,10 +28,11 @@ services:
             - caddy
 
     db:
-        image: "postgres:alpine"
+        image: "postgres:10-alpine"
         restart: always
         volumes:
             - "db:/var/lib/postgresql/data"
+            - "./postgres_init:/docker-entrypoint-initdb.d"
         environment:
             POSTGRES_USER: mygpo
             POSTGRES_PASSWORD: mygpo
@@ -39,7 +41,7 @@ services:
             - "5432"
 
     redis:
-        image: "redis:alpine"
+        image: "redis:5-alpine"
         restart: always
 
     beat:
